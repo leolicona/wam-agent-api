@@ -137,12 +137,17 @@ export const textSplitter = () => {
  * Helper function to create standardized result format
  */
 function createTextSplitterResult(originalText: string, chunks: string[]): TextSplitterResult {
-  let currentIndex = 0;
+  let searchFromIndex = 0;
   
   const textChunks: TextChunk[] = chunks.map((chunk, index) => {
-    const startIndex = currentIndex;
+    // Find the start index of the current chunk in the original text.
+    // Searching from the last position ensures that we find the correct chunk
+    // even with overlaps or repeated text segments.
+    const startIndex = originalText.indexOf(chunk, searchFromIndex);
     const endIndex = startIndex + chunk.length;
-    currentIndex = endIndex;
+
+    // The next search should start just after the beginning of the current chunk.
+    searchFromIndex = startIndex + 1;
     
     return {
       content: chunk,
