@@ -1,0 +1,23 @@
+{
+  "name": "tourist-guide-service",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@hono/zod-validator": "^0.7.0",
+    "hono": "^4.7.11",
+    "hono-rate-limiter": "^0.4.2",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.41",
+    "@types/node": "^24.0.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.4.0"
+  }
+}
