@@ -6,6 +6,10 @@
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
+  "vars": {
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL": "wapp-agent-appoiments@wappaiagent.iam.gserviceaccount.com",  
+  },
+
    "services": [
     {
       "binding": "AUTH_SERVICE",

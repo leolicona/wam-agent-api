@@ -6,6 +6,7 @@ import { rateLimitPresets } from './middleware/rate.limit'
 import { globalErrorHandler } from './middleware/error.handler'
 import { auth } from './routes/auth'
 import vectorizeRouter from './routes/vectorize'
+import calendar from './routes/calendar'
 
 const app = new Hono<{ Bindings: Env }>()
 
@@ -25,6 +26,7 @@ app.use('*', corsMiddleware)
 app.route('/auth', auth)
 
 app.route('/vectorize', vectorizeRouter)
+app.route('/calendar', calendar)
 
 // Basic routes
 app.get('/', (c) => {

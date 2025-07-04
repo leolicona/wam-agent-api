@@ -6,7 +6,7 @@ import { VectorizeRequest } from './vectorize.schema';
 export const vectorizeData = async (c: Context) => {
   console.log('Starting vectorization process');
   try {
-    console.log('Attempting to parse request body');
+    console.log('Attempting to parse request body', c.env);
     const requestBody: VectorizeRequest = await c.req.json();
     const { text, chunking } = requestBody;
     console.log('Received text length:', text.length);

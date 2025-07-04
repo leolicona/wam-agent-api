@@ -4,6 +4,8 @@
 export interface Env {
 
   GEMINI_API_KEY: string;
+  GOOGLE_SERVICE_ACCOUNT_EMAIL: string;
+  GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: string;
   // Environment variables
   AUTH_SERVICE: Fetcher;
   JWT_SECRET: string;
