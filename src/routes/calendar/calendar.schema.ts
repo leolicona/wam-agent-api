@@ -32,6 +32,7 @@ export const CreateCalendarSchema = z.object({
   description: z.string().optional(),
   timeZone: z.string().optional(),
   location: z.string().optional(),
+  businessId: z.string().min(1, 'Business ID is required'),
 });
 
 export const GetFreeBusySchema = z.object({

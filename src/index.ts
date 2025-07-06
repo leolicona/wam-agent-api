@@ -7,6 +7,7 @@ import { globalErrorHandler } from './middleware/error.handler'
 import { auth } from './routes/auth'
 import vectorizeRouter from './routes/vectorize'
 import calendar from './routes/calendar'
+import business from './routes/business'
 
 const app = new Hono<{ Bindings: Env }>()
 
@@ -27,6 +28,7 @@ app.route('/auth', auth)
 
 app.route('/vectorize', vectorizeRouter)
 app.route('/calendar', calendar)
+app.route('/business', business)
 
 // Basic routes
 app.get('/', (c) => {

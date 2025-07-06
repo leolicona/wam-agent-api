@@ -1,5 +1,8 @@
 import { Context } from 'hono';
 import { createGoogleCalendarService, CalendarEvent, GoogleCalendarResponse } from '../../core/calendar/googleCalendar.service';
+import { createDatabase } from '../../core/database/connection';
+import { findBusinessById } from '../../core/database/business.service';
+import { createCalendarService as registerCalendarService } from '../../core/database/calendarServices.service';
 
 import { CreateEventSchema, parseEventDates, GetCalendarSchema, CreateCalendarSchema, GetFreeBusySchema, ListEventsSchema, GetEventSchema, UpdateEventSchema, DeleteEventSchema } from './calendar.schema';
 import { z } from 'zod';
@@ -55,25 +58,45 @@ export const createCalendarEvent = async (c: Context<{ Bindings: Env }>) => {
 };
 
 export const createCalendar = async (c: Context<{ Bindings: Env }>) => {
-  const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY } = c.env;
+  const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY, DB } = c.env;
+  const db = createDatabase(c.env);
 
   if (!GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY) {
     return c.json({ message: 'Missing Google Calendar service account credentials' }, 500);
   }
 
   try {
-    const calendarData = c.req.valid('json') as z.infer<typeof CreateCalendarSchema>;
+    const { businessId, ...calendarData } = c.req.valid('json') as z.infer<typeof CreateCalendarSchema>;
 
-    // For creating a new calendar, we don't need a specific calendarId in the service config
-    // We can pass a dummy or empty string, as the createCalendar method doesn't use it
+    // 1. Validate businessId
+    const business = await findBusinessById(db, businessId);
+    if (!business) {
+      return c.json({ message: 'Business not found' }, 404);
+    }
+
+    // 2. Create Google Calendar
     const googleCalendarService = createGoogleCalendarService({
       serviceAccountEmail: GOOGLE_SERVICE_ACCOUNT_EMAIL,
       privateKey: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
-      calendarId: '', // Dummy calendarId as it's not used for creating a new calendar
+      calendarId: '', // Not needed for creation
     });
 
     const newCalendar = await googleCalendarService.createCalendar(calendarData);
-    return c.json(newCalendar, 201);
+
+    if (!newCalendar.id) {
+      return c.json({ message: 'Failed to create Google Calendar' }, 500);
+    }
+
+    // 3. Register calendar in the database
+    const registeredCalendar = await registerCalendarService(db, {
+      businessId: businessId,
+      googleCalendarId: newCalendar.id,
+      name: newCalendar.summary || 'Unnamed Calendar',
+      description: newCalendar.description,
+      settings: {}, // Add any default settings if necessary
+    });
+
+    return c.json(registeredCalendar, 201);
   } catch (error: any) {
     return c.json({ message: error.message }, 500);
   }
