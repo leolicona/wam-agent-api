@@ -403,7 +403,11 @@ export const createGoogleCalendarService = (config: GoogleCalendarConfig): Googl
     ): Promise<FreeBusyResponse> => {
       const accessToken = await getAuthenticatedToken();
       
-      const items = calendars?.map(cal => ({ id: cal })) || [{ id: calendarId }];
+      const items = calendars?.map(cal => ({ id: cal })) || [];
+
+      if (items.length === 0) {
+        return { calendars: {} };
+      }
 
       const response = await makeCalendarRequest(
         accessToken,

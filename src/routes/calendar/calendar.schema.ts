@@ -38,7 +38,15 @@ export const CreateCalendarSchema = z.object({
 export const GetFreeBusySchema = z.object({
   timeMin: z.string().datetime('Invalid timeMin date format').transform((str) => new Date(str)),
   timeMax: z.string().datetime('Invalid timeMax date format').transform((str) => new Date(str)),
-  calendarIds: z.array(z.string()).optional(),
+  calendarIds: z.union([z.string(), z.array(z.string())]).optional().transform((val) => {
+    if (val === undefined) {
+      return undefined;
+    }
+    if (Array.isArray(val)) {
+      return val;
+    }
+    return [val]; // Convert single string to array
+  }),
 });
 
 export const ListEventsSchema = z.object({

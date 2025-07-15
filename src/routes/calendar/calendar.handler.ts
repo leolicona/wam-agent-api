@@ -112,13 +112,10 @@ export const getFreeBusy = async (c: Context<{ Bindings: Env }>) => {
   try {
     const { timeMin, timeMax, calendarIds } = c.req.valid('query') as z.infer<typeof GetFreeBusySchema>;
 
-    // Use the first calendarId from the list, or a dummy if none provided
-    const calendarId = calendarIds && calendarIds.length > 0 ? calendarIds[0] : 'primary';
-
     const googleCalendarService = createGoogleCalendarService({
       serviceAccountEmail: GOOGLE_SERVICE_ACCOUNT_EMAIL,
       privateKey: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
-      calendarId,
+      calendarId: '', // Not needed for free/busy query
     });
 
     const freeBusyResponse = await googleCalendarService.getFreeBusy(timeMin, timeMax, calendarIds);
